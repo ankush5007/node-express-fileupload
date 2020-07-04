@@ -1,6 +1,13 @@
 const express = require('express');
 const router = express.Router();
 var _ = require('lodash');
+const multer  =require('multer');
+//multer configration
+const FILE_PATH = 'uploads/';
+const upload = multer({
+  dest: FILE_PATH
+});
+
 /**
  * express-fileupload middleware provide mv function to move files or directory
  */
@@ -88,9 +95,24 @@ upload_multiple_files = (request,response,next) => {
 router.post('/upload_multiple',upload_multiple_files); 
 
 
-
-
-
+// multer upload single gile
+router.post('/upload_multer',upload.single('my_file'),(request,response,next) => {
+    file = request.file;
+    console.log(file);
+    if (file){
+        response.status(200).send({
+            status : true,
+            message : 'file uploaded successfully!',
+            data : file
+        })
+    }else{
+        response.status(400).send({
+            status : false,
+            message :'file not uploaded',
+            data : file
+        })
+    }
+});
 
 
 

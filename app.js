@@ -1,3 +1,7 @@
+/**
+ * A js library that provide utltity function to handle Js native data types
+ */
+var _ = require('lodash');
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -23,11 +27,7 @@ const cors = require('cors');
 
 const fileUpload = require('express-fileupload');
 
-/**
- * A js library that provide utltity function to handle Js native data types
- */
 
-const _ = require('lodash');
 
 
 
@@ -49,7 +49,6 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
-
 app.use(fileUpload({
   createParentPath : true,
 }));
@@ -81,4 +80,5 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+require('events').EventEmitter.prototype._maxListeners = 0;
 module.exports = app;

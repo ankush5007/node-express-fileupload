@@ -4,9 +4,26 @@ var _ = require('lodash');
 const multer  =require('multer');
 //multer configration
 const FILE_PATH = 'uploads/';
+
 const upload = multer({
-  dest: FILE_PATH
+  dest: FILE_PATH,
+  limits: {
+    files: 5, // allow up to 5 files per request,
+    fieldSize: 2 * 1024 * 1024 // 2 MB (max file size)
+},
+fileFilter: (req, file, cb) => {
+    // allow images only
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+        return cb(new Error('Only image are allowed.'), false);
+    }
+    cb(null, true);
+}
 });
+
+/**
+ *  To handle single file use object.single(filename)
+ *  To handle multiple file use object.array(filename,max_count)
+ */
 
 /**
  * express-fileupload middleware provide mv function to move files or directory
@@ -96,6 +113,7 @@ router.post('/upload_multiple',upload_multiple_files);
 
 
 // multer upload single gile
+// in case of single instanc saved in request.file
 router.post('/upload_multer',upload.single('my_file'),(request,response,next) => {
     file = request.file;
     console.log(file);
@@ -114,8 +132,30 @@ router.post('/upload_multer',upload.single('my_file'),(request,response,next) =>
     }
 });
 
+// multer upload multiples files
+// in case of multiple instane save in request.files 
+// we used this approach for proper error handling
 
-
+var upload_one = multer({
+    dest: FILE_PATH,
+}).array('files',4);
+router.post('/upload_multer_multi',(request,response,next) => {
+    upload_one(request,response,(error) => {
+        if (error){
+            response.status(400).send({
+                status : false,
+                message: error,
+                data:{}
+            });
+        }else{
+            response.status(200).send({
+                status : true,
+                message : 'file uploaded successfully!',
+                data : request.files
+            })
+        }
+    });
+});
 
 
 
